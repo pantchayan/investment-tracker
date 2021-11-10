@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
-
+import db from "../firebase";
 const Graph = ({ data }) => {
   useEffect(() => {
     d3.selectAll("svg").remove();
     d3.select(".graph").append("svg");
     d3.select("svg").append("g");
-    console.log("USE EFFECT FOR INITIAL @ GRAPH RAN");
+    // console.log("USE EFFECT FOR INITIAL @ GRAPH RAN");
   }, []);
 
   useEffect(() => {
@@ -74,6 +74,61 @@ const Graph = ({ data }) => {
         .transition()
         .duration(700)
         .attrTween("d", (d) => arcTweenEnter(d));
+
+      chart
+        .selectAll("path")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut)
+        .on("click", handleClickEvent);
+    };
+
+    function handleMouseOver() {
+      let name = d3.select(this)._groups[0][0].__data__.data.name;
+      let cost = d3.select(this)._groups[0][0].__data__.data.cost;
+      let id = d3.select(this)._groups[0][0].__data__.data.id;
+
+      let data = [{ name, cost, id }];
+      makePopUp(data);
+      d3.select(this).style("opacity", "0.5");
+    }
+
+    function handleMouseOut() {
+      makePopUp([]);
+      d3.select(this).style("opacity", "1");
+    }
+
+    function handleClickEvent() {
+      let id = d3.select(this)._groups[0][0].__data__.data.id;
+      db.collection("investments").doc(id).delete();
+    }
+
+    let makePopUp = (data) => {
+      let details = d3.select(".graph>svg").selectAll(".detail").data(data);
+      details.exit().remove();
+
+      details
+        .attr("x", (d) => 0)
+        .attr("y", (d) => 10)
+        .attr("text-anchor", "left")
+        .text((d) => d.name + ": ₹" + d.cost)
+        .style("alignment-baseline", "middle")
+        .style("font-weight", "500")
+        .style("font-size", "15")
+        .style("fill", "white")
+        .attr("class", "detail");
+
+      details
+        .enter()
+        .append("text")
+        .attr("x", (d) => 0)
+        .attr("y", (d) => 10)
+        .attr("text-anchor", "left")
+        .text((d) => d.name + ": ₹" + d.cost)
+        .style("alignment-baseline", "middle")
+        .style("font-weight", "500")
+        .style("font-size", "15")
+        .style("fill", "white")
+        .attr("class", "detail");
     };
 
     const arcTweenEnter = (d) => {
@@ -96,7 +151,7 @@ const Graph = ({ data }) => {
     };
 
     update(data);
-    console.log("USE EFFECT FOR DATA @ GRAPH RAN");
+    // console.log("USE EFFECT FOR DATA @ GRAPH RAN");
   }, [data]);
 
   return (

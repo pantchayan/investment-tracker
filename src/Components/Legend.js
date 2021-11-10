@@ -7,12 +7,12 @@ const Legend = ({ data }) => {
     d3.select(".legend").append("svg");
     d3.select(".legend > svg").append("g");
 
-    console.log("USE EFFECT FOR INITIAL @ LEGEND RAN");
+    // console.log("USE EFFECT FOR INITIAL @ LEGEND RAN");
   }, []);
 
   useEffect(() => {
-    console.log("USE EFFECT FOR DATA @ LEGEND RAN");
-
+    // console.log("USE EFFECT FOR DATA @ LEGEND RAN");
+    d3.select('.legend > svg').attr('height', '100%')
     let legend = d3.select(".legend > svg > g").attr('transform', 'translate(10,10)');
     const pie = d3
       .pie()
@@ -36,7 +36,7 @@ const Legend = ({ data }) => {
       const texts = legend.selectAll("text").data(pie(data));
       const circles = legend.selectAll("circle").data(pie(data));
 
-      console.log(texts, circles);
+      // console.log(texts, circles);
       texts
         .exit()
         // .transition()
